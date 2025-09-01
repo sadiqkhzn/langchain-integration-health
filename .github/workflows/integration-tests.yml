@@ -1,0 +1,259 @@
+name: LangChain Integration Health Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      integration_filter:
+        description: 'Filter integrations to test (comma-separated)'
+        required: false
+        default: ''
+
+jobs:
+  discover-integrations:
+    runs-on: ubuntu-latest
+    outputs:
+      integrations: ${{ steps.discovery.outputs.integrations }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install -e .
+        pip install langchain langchain-community
+    
+    - name: Discover integrations
+      id: discovery
+      run: |
+        python -c "
+        from src.utils.discovery import IntegrationDiscovery
+        import json
+        
+        discovery = IntegrationDiscovery()
+        integrations = discovery.discover_all_integrations()
+        
+        # Flatten to list of integration names for matrix strategy
+        all_integrations = []
+        for category, classes in integrations.items():
+            for cls in classes:
+                all_integrations.append({
+                    'name': cls.__name__,
+                    'category': category,
+                    'module': cls.__module__
+                })
+        
+        print(f'integrations={json.dumps(all_integrations)}')
+        " >> $GITHUB_OUTPUT
+
+  test-integrations:
+    needs: discover-integrations
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        integration: ${{ fromJson(needs.discover-integrations.outputs.integrations) }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install -e .
+        pip install langchain langchain-community
+    
+    - name: Test integration
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+        HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+        LIH_MOCK_MODE: true  # Run in mock mode by default
+      run: |
+        python -c "
+        import asyncio
+        import json
+        from datetime import datetime
+        from src.testers import LLMIntegrationTester, ChatModelTester, EmbeddingsTester
+        from src.utils.config import Config
+        from src.utils.discovery import IntegrationDiscovery
+        
+        async def test_integration():
+            config = Config.from_env()
+            discovery = IntegrationDiscovery()
+            
+            # Find the integration class
+            integrations = discovery.discover_all_integrations()
+            integration_class = None
+            
+            for category, classes in integrations.items():
+                for cls in classes:
+                    if cls.__name__ == '${{ matrix.integration.name }}':
+                        integration_class = cls
+                        break
+                if integration_class:
+                    break
+            
+            if not integration_class:
+                print(f'Integration ${{ matrix.integration.name }} not found')
+                return
+            
+            # Select appropriate tester
+            category = '${{ matrix.integration.category }}'
+            if category == 'llms':
+                tester = LLMIntegrationTester(integration_class, config.get_integration_config('${{ matrix.integration.name }}'))
+            elif category == 'chat_models':
+                tester = ChatModelTester(integration_class, config.get_integration_config('${{ matrix.integration.name }}'))
+            elif category == 'embeddings':
+                tester = EmbeddingsTester(integration_class, config.get_integration_config('${{ matrix.integration.name }}'))
+            else:
+                print(f'Unknown category: {category}')
+                return
+            
+            # Run tests
+            result = await tester.run_all_tests()
+            
+            # Output results
+            output = {
+                'integration_name': result.integration_name,
+                'integration_version': result.integration_version,
+                'test_timestamp': result.test_timestamp.isoformat(),
+                'compatibility_score': result.compatibility_score,
+                'bind_tools_support': result.bind_tools_support,
+                'streaming_support': result.streaming_support,
+                'structured_output_support': result.structured_output_support,
+                'async_support': result.async_support,
+                'errors': result.errors,
+                'warnings': result.warnings,
+                'performance_metrics': result.performance_metrics
+            }
+            
+            print(f'TEST_RESULT={json.dumps(output)}')
+        
+        asyncio.run(test_integration())
+        "
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.integration.name }}
+        path: test_results.json
+        retention-days: 30
+
+  generate-report:
+    needs: test-integrations
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install -e .
+    
+    - name: Download all test results
+      uses: actions/download-artifact@v3
+      with:
+        path: test-results/
+    
+    - name: Generate compatibility report
+      run: |
+        python -c "
+        import json
+        import os
+        from glob import glob
+        from src.utils.reporters import CompatibilityReporter
+        from src.testers.base_tester import IntegrationTestResult
+        from datetime import datetime
+        
+        # Collect all test results
+        results = []
+        
+        for result_file in glob('test-results/*/test_results.json'):
+            try:
+                with open(result_file) as f:
+                    data = json.load(f)
+                
+                result = IntegrationTestResult(
+                    integration_name=data['integration_name'],
+                    integration_version=data['integration_version'],
+                    test_timestamp=datetime.fromisoformat(data['test_timestamp']),
+                    bind_tools_support=data['bind_tools_support'],
+                    streaming_support=data['streaming_support'],
+                    structured_output_support=data['structured_output_support'],
+                    async_support=data['async_support'],
+                    errors=data['errors'],
+                    warnings=data['warnings'],
+                    performance_metrics=data['performance_metrics'],
+                    compatibility_score=data['compatibility_score']
+                )
+                results.append(result)
+            except Exception as e:
+                print(f'Error processing {result_file}: {e}')
+        
+        # Generate reports
+        if results:
+            reporter = CompatibilityReporter(results)
+            
+            # Save reports
+            reporter.save_report('json', 'compatibility_report.json')
+            reporter.save_report('csv', 'compatibility_report.csv')
+            reporter.save_report('markdown', 'compatibility_report.md')
+            
+            print(f'Generated reports for {len(results)} integrations')
+        else:
+            print('No test results found')
+        "
+    
+    - name: Upload compatibility reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: compatibility-reports
+        path: |
+          compatibility_report.json
+          compatibility_report.csv
+          compatibility_report.md
+        retention-days: 90
+    
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const report = fs.readFileSync('compatibility_report.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## LangChain Integration Compatibility Report\n\n${report}`
+            });
+          } catch (error) {
+            console.log('No compatibility report found');
+          }

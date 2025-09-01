@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langchain-integration-health"
+version = "0.1.0"
+description = "Comprehensive testing framework and dashboard for LangChain integration compatibility"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Sadiq Khan", email = "sadiqkhzn@example.com"}
+]
+maintainers = [
+    {name = "Sadiq Khan", email = "sadiqkhzn@example.com"}
+]
+keywords = ["langchain", "testing", "integration", "compatibility", "dashboard"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+    "streamlit>=1.28.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.0.0",
+    "pandas>=2.0.0",
+    "plotly>=5.17.0",
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "aiohttp>=3.9.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.12.0",
+    "typer>=0.9.0",
+    "rich>=13.6.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio", 
+    "black",
+    "flake8",
+    "mypy",
+    "pre-commit"
+]
+
+[project.urls]
+Homepage = "https://github.com/sadiqkhzn/langchain-integration-health"
+Repository = "https://github.com/sadiqkhzn/langchain-integration-health"
+Issues = "https://github.com/sadiqkhzn/langchain-integration-health/issues"
+Documentation = "https://github.com/sadiqkhzn/langchain-integration-health#readme"
+
+[project.scripts]
+langchain-health = "langchain_integration_health.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
