@@ -61,7 +61,7 @@ asyncio.run(test_integration())
 
 ## Features
 
-### 🧪 Comprehensive Testing
+### Comprehensive Testing
 - Tests for required methods: `bind_tools()`, `stream()`, `with_structured_output()`, etc.
 - Compatibility matrix generation
 - Performance benchmarking
@@ -74,12 +74,12 @@ asyncio.run(test_integration())
 - Historical trend analysis
 - Export capabilities (JSON, CSV, Markdown)
 
-### 🔍 Automatic Discovery
+### Automatic Discovery
 - Scans installed packages for LangChain integrations
 - Supports main langchain, langchain-community, and third-party packages
 - Parallel testing for faster results
 
-### 🛠️ Integration Fixes
+### Integration Fixes
 - Example implementations for common issues (e.g., MLXPipeline bind_tools fix)
 - Wrapper patterns for adding missing functionality
 - Best practices for LangChain compatibility
