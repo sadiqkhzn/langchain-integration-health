@@ -25,10 +25,10 @@ class CompatibilityMatrix:
                 "Integration": result.integration_name,
                 "Version": result.integration_version,
                 "Score": result.compatibility_score,
-                "bind_tools": "✅" if result.bind_tools_support else "❌",
-                "streaming": "✅" if result.streaming_support else "❌", 
-                "structured_output": "✅" if result.structured_output_support else "❌",
-                "async": "✅" if result.async_support else "❌",
+                "bind_tools": "Yes" if result.bind_tools_support else "No",
+                "streaming": "Yes" if result.streaming_support else "No", 
+                "structured_output": "Yes" if result.structured_output_support else "No",
+                "async": "Yes" if result.async_support else "No",
                 "Errors": len(result.errors),
                 "Warnings": len(result.warnings)
             }
@@ -64,11 +64,11 @@ class CompatibilityMatrix:
             st.metric("High Compatibility (≥0.8)", f"{high_compatibility}/{total_integrations}")
         
         with col3:
-            bind_tools_support = len(df[df["bind_tools"] == "✅"])
+            bind_tools_support = len(df[df["bind_tools"] == "Yes"])
             st.metric("bind_tools Support", f"{bind_tools_support}/{total_integrations}")
         
         with col4:
-            streaming_support = len(df[df["streaming"] == "✅"])
+            streaming_support = len(df[df["streaming"] == "Yes"])
             st.metric("Streaming Support", f"{streaming_support}/{total_integrations}")
 
 class IntegrationDetails:
@@ -111,24 +111,24 @@ class IntegrationDetails:
                     }
                     
                     for feature, supported in features.items():
-                        icon = "✅" if supported else "❌"
+                        icon = "Yes" if supported else "No"
                         st.write(f"**{feature}**: {icon}")
                 
                 # Errors section
                 if result.errors:
-                    st.subheader("❌ Errors")
+                    st.subheader("Errors")
                     for error in result.errors:
                         st.error(error)
                 
                 # Warnings section
                 if result.warnings:
-                    st.subheader("⚠️ Warnings")
+                    st.subheader("Warnings")
                     for warning in result.warnings:
                         st.warning(warning)
                 
                 # Performance metrics
                 if result.performance_metrics:
-                    st.subheader("⚡ Performance Metrics")
+                    st.subheader("Performance Metrics")
                     
                     metrics_df = pd.DataFrame([
                         {"Metric": metric, "Value": value}

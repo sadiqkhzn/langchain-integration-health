@@ -22,7 +22,7 @@ def create_integration_dashboard():
         initial_sidebar_state="expanded"
     )
     
-    st.title("🔗 LangChain Integration Health Dashboard")
+    st.title("LangChain Integration Health Dashboard")
     st.markdown("Real-time compatibility monitoring for LangChain integrations")
     
     # Initialize data loader
@@ -33,19 +33,19 @@ def create_integration_dashboard():
         st.header("Controls")
         
         # Refresh data button
-        if st.button("🔄 Refresh Data", use_container_width=True):
+        if st.button("Refresh Data", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
         
         # Test new integration
-        if st.button("🧪 Run New Tests", use_container_width=True):
+        if st.button("Run New Tests", use_container_width=True):
             run_integration_tests()
         
         # Export options
         st.header("Export Options")
         export_format = st.selectbox("Format", ["JSON", "CSV", "Markdown"])
         
-        if st.button("📥 Export Results", use_container_width=True):
+        if st.button("Export Results", use_container_width=True):
             export_results(export_format.lower())
         
         # Filters
@@ -75,7 +75,7 @@ def create_integration_dashboard():
         st.warning("No test results found. Run some tests to see the dashboard in action!")
         
         # Show discovery section
-        st.header("🔍 Available Integrations")
+        st.header("Available Integrations")
         discovery = IntegrationDiscovery()
         integrations = discovery.discover_all_integrations()
         
@@ -162,7 +162,7 @@ def display_dashboard_overview(test_results: List[Any]):
 
 def display_performance_metrics(test_results: List[Any]):
     """Display performance metrics visualization"""
-    st.header("⚡ Performance Metrics")
+    st.header("Performance Metrics")
     
     if not test_results:
         return
@@ -212,7 +212,7 @@ def display_performance_metrics(test_results: List[Any]):
 
 def display_historical_trends(data_loader: DataLoader):
     """Display historical compatibility trends"""
-    st.header("📈 Historical Trends")
+    st.header("Historical Trends")
     
     historical_data = data_loader.load_historical_data()
     
