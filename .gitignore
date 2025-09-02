@@ -80,4 +80,7 @@ Thumbs.db
 logs/
 
 # Streamlit
-.streamlit/
+.streamlit/test_env/
+dist/
+build/
+*.egg-info/
