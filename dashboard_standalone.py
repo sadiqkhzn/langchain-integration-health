@@ -25,17 +25,17 @@ def main():
     with st.sidebar:
         st.header("Controls")
         
-        if st.button("Refresh Data", use_container_width=True):
+        if st.button("Refresh Data", width="stretch"):
             st.cache_data.clear()
             st.rerun()
         
-        if st.button("Run New Tests", use_container_width=True):
+        if st.button("Run New Tests", width="stretch"):
             st.info("Integration testing would run here!")
         
         st.header("Export Options")
         export_format = st.selectbox("Format", ["JSON", "CSV", "Markdown"])
         
-        if st.button("Export Results", use_container_width=True):
+        if st.button("Export Results", width="stretch"):
             st.info(f"Would export in {export_format} format")
         
         st.header("Filters")
@@ -126,7 +126,7 @@ def create_demo_data():
             }
         },
         {
-            "integration_name": "Claude",
+            "integration_name": "Anthropic",
             "integration_version": "0.2.1",
             "compatibility_score": 0.90,
             "bind_tools_support": True,
@@ -248,7 +248,7 @@ def display_compatibility_matrix(data):
             return "background-color: #f8d7da"
     
     styled_df = df.style.map(score_color, subset=["Score"])
-    st.dataframe(styled_df, use_container_width=True, hide_index=True)
+    st.dataframe(styled_df, width="stretch", hide_index=True)
 
 def display_detailed_results(data):
     """Display detailed results with expandable sections"""

@@ -101,14 +101,14 @@ class CompatibilityReporter:
         ])
         
         for result in sorted(self.test_results, key=lambda x: x.compatibility_score, reverse=True):
-            score_emoji = "🟢" if result.compatibility_score >= 0.8 else "🟡" if result.compatibility_score >= 0.5 else "🔴"
+            score_status = "High" if result.compatibility_score >= 0.8 else "Medium" if result.compatibility_score >= 0.5 else "Low"
             md_lines.append(
                 f"| {result.integration_name} | {result.integration_version} | "
-                f"{score_emoji} {result.compatibility_score:.2f} | "
-                f"{'✅' if result.bind_tools_support else '❌'} | "
-                f"{'✅' if result.streaming_support else '❌'} | "
-                f"{'✅' if result.structured_output_support else '❌'} | "
-                f"{'✅' if result.async_support else '❌'} |"
+                f"{result.compatibility_score:.2f} ({score_status}) | "
+                f"{'Yes' if result.bind_tools_support else 'No'} | "
+                f"{'Yes' if result.streaming_support else 'No'} | "
+                f"{'Yes' if result.structured_output_support else 'No'} | "
+                f"{'Yes' if result.async_support else 'No'} |"
             )
         
         # Add detailed results section

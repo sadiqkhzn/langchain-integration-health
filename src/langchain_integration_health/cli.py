@@ -210,7 +210,7 @@ def dashboard(
     try:
         subprocess.run(cmd)
     except KeyboardInterrupt:
-        console.print("\n👋 Dashboard stopped")
+        console.print("\nDashboard stopped")
 
 @app.command()
 def report(

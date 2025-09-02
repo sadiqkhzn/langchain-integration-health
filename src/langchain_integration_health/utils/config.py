@@ -113,7 +113,7 @@ class Config(BaseModel):
         
         if "openai" in name_lower:
             return "openai"
-        elif "anthropic" in name_lower or "claude" in name_lower:
+        elif "anthropic" in name_lower:
             return "anthropic"
         elif "google" in name_lower or "gemini" in name_lower:
             return "google"
