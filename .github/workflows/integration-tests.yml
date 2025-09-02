@@ -38,7 +38,7 @@ jobs:
       id: discovery
       run: |
         python -c "
-        from src.utils.discovery import IntegrationDiscovery
+        from langchain_integration_health.utils.discovery import IntegrationDiscovery
         import json
         
         discovery = IntegrationDiscovery()
@@ -91,9 +91,9 @@ jobs:
         import asyncio
         import json
         from datetime import datetime
-        from src.testers import LLMIntegrationTester, ChatModelTester, EmbeddingsTester
-        from src.utils.config import Config
-        from src.utils.discovery import IntegrationDiscovery
+        from langchain_integration_health.testers import LLMIntegrationTester, ChatModelTester, EmbeddingsTester
+        from langchain_integration_health.utils.config import Config
+        from langchain_integration_health.utils.discovery import IntegrationDiscovery
         
         async def test_integration():
             config = Config.from_env()
@@ -185,8 +185,8 @@ jobs:
         import json
         import os
         from glob import glob
-        from src.utils.reporters import CompatibilityReporter
-        from src.testers.base_tester import IntegrationTestResult
+        from langchain_integration_health.utils.reporters import CompatibilityReporter
+        from langchain_integration_health.testers.base_tester import IntegrationTestResult
         from datetime import datetime
         
         # Collect all test results

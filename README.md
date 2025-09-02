@@ -23,8 +23,16 @@ This framework provides:
 
 ### Installation
 
+#### From PyPI (Recommended)
+
 ```bash
-git clone <repository-url>
+pip install langchain-integration-health
+```
+
+#### From Source
+
+```bash
+git clone https://github.com/sadiqkhzn/langchain-integration-health.git
 cd langchain-integration-health
 pip install -e .
 ```
@@ -32,15 +40,40 @@ pip install -e .
 ### Run the Dashboard
 
 ```bash
-streamlit run src/dashboard/app.py
+langchain-health dashboard
 ```
 
-### Run Integration Tests
+Or run Streamlit directly:
+
+```bash
+streamlit run -m langchain_integration_health.dashboard.app
+```
+
+### CLI Usage
+
+```bash
+# Discover available integrations
+langchain-health discover
+
+# Run integration tests
+langchain-health test
+
+# Launch the dashboard
+langchain-health dashboard
+
+# Generate compatibility report
+langchain-health report
+
+# Clean old test results
+langchain-health clean
+```
+
+### Programmatic Usage
 
 ```python
 import asyncio
-from src.testers import LLMIntegrationTester
-from src.utils.config import Config
+from langchain_integration_health.testers import LLMIntegrationTester
+from langchain_integration_health.utils.config import Config
 
 # Test a specific integration
 async def test_integration():
@@ -203,7 +236,7 @@ The framework includes GitHub Actions workflow for automated testing:
 The framework includes a complete example of how to fix the MLXPipeline `bind_tools` issue:
 
 ```python
-from src.examples.mlx_pipeline_fix import create_mlx_wrapper
+from langchain_integration_health.examples.mlx_pipeline_fix import create_mlx_wrapper
 
 # Original MLXPipeline (missing bind_tools)
 mlx = MLXPipeline(model_name="mlx-community/Llama-3.2-1B-Instruct-4bit")
@@ -280,7 +313,7 @@ class IntegrationTestResult:
 ### Development Setup
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/sadiqkhzn/langchain-integration-health.git
 cd langchain-integration-health
 pip install -e ".[dev]"
 pytest tests/
