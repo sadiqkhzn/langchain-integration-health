@@ -22,10 +22,10 @@ jobs:
       integrations: ${{ steps.discovery.outputs.integrations }}
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -66,10 +66,10 @@ jobs:
         integration: ${{ fromJson(needs.discover-integrations.outputs.integrations) }}
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -151,7 +151,7 @@ jobs:
         "
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.integration.name }}
         path: test_results.json
@@ -163,10 +163,10 @@ jobs:
     if: always()
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -175,7 +175,7 @@ jobs:
         pip install -e .
     
     - name: Download all test results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: test-results/
     
@@ -229,7 +229,7 @@ jobs:
         "
     
     - name: Upload compatibility reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: compatibility-reports
         path: |
@@ -240,7 +240,7 @@ jobs:
     
     - name: Comment PR with results
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           const fs = require('fs');
