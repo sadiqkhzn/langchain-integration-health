@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "langchain-integration-health"
-version = "0.1.1"
+version = "0.1.2"
 description = "Comprehensive testing framework and dashboard for LangChain integration compatibility"
 readme = "README.md"
 license = {text = "MIT"}
